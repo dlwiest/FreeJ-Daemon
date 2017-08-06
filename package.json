@@ -1,0 +1,19 @@
+{
+  "name": "freej-daemon",
+  "version": "1.0.0",
+  "description": "Provides real time playback information and controls for Spotify",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dlwiest/FreeJ-Daemon.git"
+  },
+  "author": "Derrick L. Wiest",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dlwiest/FreeJ-Daemon/issues"
+  },
+  "homepage": "https://github.com/dlwiest/FreeJ-Daemon#readme"
+}
