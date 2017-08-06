@@ -4,7 +4,8 @@
   "description": "Provides real time playback information and controls for Spotify",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "node_modules/.bin/eslint ."
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/dlwiest/FreeJ-Daemon/issues"
   },
-  "homepage": "https://github.com/dlwiest/FreeJ-Daemon#readme"
+  "homepage": "https://github.com/dlwiest/FreeJ-Daemon#readme",
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^4.4.0",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-import": "^2.7.0"
+  }
 }
