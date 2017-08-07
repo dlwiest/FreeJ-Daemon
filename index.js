@@ -1,9 +1,12 @@
 const http = require('http');
+const Spotify = require('./libs/spotify.js');
 
-const hostname = 'localhost';
+const spotify = new Spotify();
+
 const port = 3001;
 
 const server = http.createServer((request, response) => {
-	console.log(request);
-	console.log(response);
+	// Connection established
 });
+
+server.listen(port);
