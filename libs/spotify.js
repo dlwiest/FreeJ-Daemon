@@ -28,21 +28,19 @@ module.exports = class Spotify {
 	}
 
 	constructor() {
-		this.connected = false;
 		this.spotify = null;
+		this.connected = false;
 
 		this.connect();
 	}
 
 	connect() {
-		this.connected = false;
+		this.setConnectedStatus(false);
 		Spotify.generateToken().then((token) => {
 			this.spotify = new SpotifyControl({
 				token,
 			});
 			this.spotify.connect().then(() => {
-				this.connected = true;
-				console.log('Established connection to Spotify client');
 				this.updatePlaybackStatus();
 			})
 				.catch(() => setTimeout(this.connect.bind(this), 1000));
@@ -51,16 +49,26 @@ module.exports = class Spotify {
 	}
 
 	updatePlaybackStatus() {
-		if (this.connected) {
-			this.spotify.status().then((result) => {
-				console.log(result);
+		this.spotify.status().then((result) => {
+			if (result && result.online) {
+				this.setConnectedStatus(true);
 				setTimeout(this.updatePlaybackStatus.bind(this), 100);
-			})
-				.catch(() => {
-					this.connected = false;
-					console.log('Lost connection to Spotify client');
-					this.connect();
-				});
+			} else this.setConnectedStatus(false);
+		})
+			.catch(() => {
+				this.setConnectedStatus(false);
+				this.connect();
+			});
+	}
+
+	setConnectedStatus(status) {
+		if (status !== this.connected) {
+			this.connected = status;
+			if (this.connected) console.log('Established connection to Spotify client');
+			else {
+				console.log('Lost connection to Spotify client');
+				setTimeout(this.connect.bind(this), 1000);
+			}
 		}
 	}
 };
