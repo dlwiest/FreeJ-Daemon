@@ -33,6 +33,7 @@ module.exports = class Spotify {
 		this.status = {
 			isOnline: false,
 			isPlaying: false,
+			track: {},
 			position: 0.0,
 		};
 
@@ -40,18 +41,22 @@ module.exports = class Spotify {
 	}
 
 	connect() {
-		Spotify.retrieveToken().then((token) => {
-			this.spotify = new SpotifyControl({
-				token,
-			});
-			this.spotify.connect().then(() => {
-				this.updatePlaybackStatus();
+		try {
+			Spotify.retrieveToken().then((token) => {
+				this.spotify = new SpotifyControl({
+					token,
+				});
+				this.spotify.connect().then(() => {
+					this.updatePlaybackStatus();
+				})
+					// Failed to connect to Spotify
+					.catch(() => setTimeout(this.connect.bind(this), 1000));
 			})
-				// Failed to connect to Spotify
+				// Failed to retrieve Spotify token
 				.catch(() => setTimeout(this.connect.bind(this), 1000));
-		})
-			// Failed to retrieve Spotify token
-			.catch(() => setTimeout(this.connect.bind(this), 1000));
+		} catch (err) {
+			console.log(`Fatal connection error: ${err}`);
+		}
 	}
 
 	updatePlaybackStatus() {
@@ -59,6 +64,15 @@ module.exports = class Spotify {
 			this.setIsConnected(true);
 			this.setStatusProperty('isOnline', result.online);
 			this.setStatusProperty('isPlaying', result.playing);
+			this.setTrackObject({
+				trackName: result.track.track_resource.name,
+				trackURI: result.track.track_resource.uri,
+				artistName: result.track.artist_resource.name,
+				artistURI: result.track.artist_resource.uri,
+				albumName: result.track.album_resource.name,
+				albumURI: result.track.album_resource.uri,
+				trackLength: result.track.length,
+			});
 			this.setStatusProperty('position', result.playing_position);
 
 			setTimeout(this.updatePlaybackStatus.bind(this), 100);
@@ -78,9 +92,14 @@ module.exports = class Spotify {
 	}
 
 	setStatusProperty(prop, val) {
-		if (this.status[prop] !== val) {
+		if (this.status[prop] !== val && typeof val !== 'undefined') {
 			this.status[prop] = val;
-			console.log(`${prop}: ${val}`);
+		}
+	}
+
+	setTrackObject(track) {
+		if (JSON.stringify(track) !== JSON.stringify(this.status.track)) {
+			this.status.track = track;
 		}
 	}
 };
