@@ -31,7 +31,9 @@ module.exports = class Spotify {
 		this.spotify = null;
 		this.connected = false;
 		this.status = {
-			online: false,
+			isOnline: false,
+			isPlaying: false,
+			position: 0.0,
 		};
 
 		this.connect();
@@ -55,8 +57,9 @@ module.exports = class Spotify {
 	updatePlaybackStatus() {
 		this.spotify.status().then((result) => {
 			this.setIsConnected(true);
-			if (result.online) this.setIsOnline(true);
-			else this.setIsOnline(false);
+			this.setStatusProperty('isOnline', result.online);
+			this.setStatusProperty('isPlaying', result.playing);
+			this.setStatusProperty('position', result.playing_position);
 
 			setTimeout(this.updatePlaybackStatus.bind(this), 100);
 		})
@@ -74,9 +77,10 @@ module.exports = class Spotify {
 		}
 	}
 
-	setIsOnline(online) {
-		if (this.status.online !== online) {
-			this.status.online = online;
+	setStatusProperty(prop, val) {
+		if (this.status[prop] !== val) {
+			this.status[prop] = val;
+			console.log(`${prop}: ${val}`);
 		}
 	}
 };
