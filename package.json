@@ -24,6 +24,7 @@
     "eslint-plugin-import": "^2.7.0"
   },
   "dependencies": {
+    "socket.io": "^2.0.3",
     "spotify-control": "^0.1.0"
   }
 }

@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>FreeJ Daemon Test</title>
+<script src="http://localhost:3001/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+const socket = io.connect('http://localhost:3001');
+
+const processElement = (key, value) => {
+	try {
+		document.getElementById(key).innerText = value;
+	} catch (err) {
+		// nada
+	}
+};
+
+socket.on('playbackStatus', (status) => {
+	for (let key in status) {
+		if (key === 'position') processElement('position', status[key]);
+		else if (key === 'track') {
+			for (let k in status[key]) {
+				processElement(k, status[key][k]);
+			}
+		}
+	}
+});
+socket.on('playbackStatusChanged', (change) => {
+	processElement(Object.keys(change)[0], change[Object.keys(change)[0]]);
+});
+</script>
+</head>
+
+<body>
+	<!--<h1>FreeJ Daemon Test</h1>
+	<h2>Spotify Playback Information</h2>-->
+	<strong>Song: </strong><span id="trackName"></span><br />
+	<strong>Artist: </strong><span id="artistName"></span><br />
+	<strong>Album: </strong><span id="albumName"></span><br />
+	<strong>Progress: </strong><span id="position"></span> / <span id="trackLength"></span>
+</body>
+</html>

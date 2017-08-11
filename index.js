@@ -1,12 +1,24 @@
-const http = require('http');
 const Spotify = require('./libs/spotify.js');
-
+const server = require('http').createServer();
+const io = require('socket.io')(server);
 const spotify = new Spotify();
 
-const port = 3001;
-
-const server = http.createServer((request, response) => {
-	// Connection established
+spotify.on('playbackStatusChanged', (change) => {
+	//console.log(change);
 });
 
-server.listen(port);
+io.on('connection', (client) => {
+	console.log('a client has connected');
+	client.emit('playbackStatus', spotify.status);
+
+	client.on('disconnect', () => {
+		console.log('a client has disconnected');
+	});
+
+	spotify.on('playbackStatusChanged', (change) => {
+		client.emit('playbackStatusChanged', change);
+	});
+});
+
+
+server.listen(3001);

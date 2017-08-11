@@ -1,7 +1,8 @@
+const EventEmitter = require('events');
 const https = require('https');
 const SpotifyControl = require('spotify-control');
 
-module.exports = class Spotify {
+module.exports = class Spotify extends EventEmitter {
 	static retrieveToken() {
 		return new Promise((resolve, reject) => {
 			const options = {
@@ -28,6 +29,7 @@ module.exports = class Spotify {
 	}
 
 	constructor() {
+		super();
 		this.spotify = null;
 		this.connected = false;
 		this.status = {
@@ -94,12 +96,14 @@ module.exports = class Spotify {
 	setStatusProperty(prop, val) {
 		if (this.status[prop] !== val && typeof val !== 'undefined') {
 			this.status[prop] = val;
+			this.emit('playbackStatusChanged', { [prop]: val });
 		}
 	}
 
 	setTrackObject(track) {
 		if (JSON.stringify(track) !== JSON.stringify(this.status.track)) {
 			this.status.track = track;
+			this.emit('playbackStatusChanged', { track });
 		}
 	}
 };
