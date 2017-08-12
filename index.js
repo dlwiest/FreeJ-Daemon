@@ -8,15 +8,14 @@ spotify.on('playbackStatusChanged', (change) => {
 });
 
 io.on('connection', (client) => {
-	console.log('a client has connected');
 	client.emit('playbackStatus', spotify.status);
-
-	client.on('disconnect', () => {
-		console.log('a client has disconnected');
-	});
 
 	spotify.on('playbackStatusChanged', (change) => {
 		client.emit('playbackStatusChanged', change);
+	});
+
+	client.on('disconnect', () => {
+		// Disconnect code
 	});
 });
 

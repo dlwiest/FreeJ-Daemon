@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FreeJ Daemon Demo</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/darkly/bootstrap.min.css" rel="stylesheet">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+	<script src="http://localhost:3001/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+	const socket = io.connect('http://localhost:3001');
+	let trackLength = 0.0;
+
+	const processElement = (key, value) => {
+		switch (key) {
+			case 'isPlaying':
+				if (value) document.getElementById('progress-bar-container').className = 'progress progress-striped active';
+				else document.getElementById('progress-bar-container').className = 'progress';
+				break;
+			case 'trackName': 
+				document.getElementById('song-name').innerText = value;
+				break;
+			case 'artistName':
+				document.getElementById('artist-name').innerText = value;
+				break;
+			case 'albumName':
+				document.getElementById('album-name').innerText = value;
+				break;
+			case 'trackLength':
+				trackLength = value;
+				break;
+			case 'position':
+				const formattedCurTime = moment("1900-01-01 00:00:00").add(value, 'seconds').format("mm:ss");
+				document.getElementById('progress-time-current').innerText = formattedCurTime;
+				if (trackLength) {
+					const progress = (value / trackLength) * 100;
+					document.getElementById('progress-bar').style.width = progress + '%';
+				}
+		}
+	}
+
+	const processStatus = (status) => {
+		for (let statusKey in status) {
+			if (statusKey === 'track') {
+				const track = status[statusKey];
+				for (let trackKey in track) processElement(trackKey, track[trackKey]);
+			} else processElement(statusKey, status[statusKey]);
+		}
+	}
+
+	const processStatusUpdate = (update) => {
+		const key = Object.keys(update)[0];
+		const value = update[key];
+		if (key === 'track') {
+			for (let trackKey in value) processElement(trackKey, value[trackKey]);
+		} else processElement(key, value);
+	}
+
+	socket.on('playbackStatus', (status) => processStatus(status));
+	socket.on('playbackStatusChanged', (update) => processStatusUpdate(update));
+
+	</script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>FreeJ Daemon Test</h1>
+		<h2>Spotify Playback Information</h2>
+		<div class="row">
+			<div class="col-sm-5 col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<h3 id="song-name" class="text-success"></h3>
+						<h5 id="artist-name"></h5>
+						<h5 id="album-name" class="text-warning"></h5>
+						<div id="progress-bar-container" class="progress progress-striped active" style="height: 20px">
+							<div class="progress-bar" id="progress-bar">
+						    	<span 
+						    		id="progress-time-current" 
+						    		style="display: block; float: left; margin: 5px 0 0 5px">
+						    	</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div class="row">
+	</div>
+</body>
+</html>
