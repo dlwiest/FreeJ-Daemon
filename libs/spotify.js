@@ -106,5 +106,9 @@ module.exports = class Spotify extends EventEmitter {
 			this.emit('playbackStatusChanged', { track });
 		}
 	}
+
+	controlPlayStatus(status) {
+		this.spotify.pause(!status);
+	}
 };
 
