@@ -52,10 +52,16 @@ module.exports = class Spotify extends EventEmitter {
 					this.updatePlaybackStatus();
 				})
 					// Failed to connect to Spotify
-					.catch(() => setTimeout(this.connect.bind(this), 1000));
+					.catch(() => {
+						this.setIsConnected(false);
+						setTimeout(this.connect.bind(this), 1000);
+					});
 			})
 				// Failed to retrieve Spotify token
-				.catch(() => setTimeout(this.connect.bind(this), 1000));
+				.catch(() => {
+					this.setIsConnected(false);
+					setTimeout(this.connect.bind(this), 1000);
+				});
 		} catch (err) {
 			console.log(`Fatal connection error: ${err}`);
 		}
@@ -80,7 +86,7 @@ module.exports = class Spotify extends EventEmitter {
 			setTimeout(this.updatePlaybackStatus.bind(this), 100);
 		})
 			.catch(() => {
-				this.setIsConnected(false);
+				// Verify connection status
 				setTimeout(this.connect.bind(this), 1000);
 			});
 	}
@@ -107,8 +113,8 @@ module.exports = class Spotify extends EventEmitter {
 		}
 	}
 
-	controlPlayStatus(status) {
-		this.spotify.pause(!status);
+	controlPlayStatus(play) {
+		this.spotify.pause(!play);
 	}
 };
 
