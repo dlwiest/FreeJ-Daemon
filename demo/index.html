@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FreeJ Daemon Demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/darkly/bootstrap.min.css" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+	<script src="../socket.io/socket.io.js"></script>
+	<script src="./script.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>FreeJ Daemon Test</h1>
+		<h2>Spotify Playback Information</h2>
+		<div class="row">
+			<div class="col-sm-6 col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<h3 id="song-name" class="text-success"></h3>
+						<h5 id="artist-name"></h5>
+						<h5 id="album-name" class="text-warning"></h5>
+						<div id="progress-bar-container" class="progress progress-striped active" style="height: 20px">
+							<div class="progress-bar" id="progress-bar">
+						    	<span
+						    		id="progress-time-current"
+						    		style="display: block; float: left; margin: 5px 0 0 5px">
+						    	</span>
+							</div>
+						</div>
+						<div id="control-play-pause"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form onSubmit="addSong()">
+							<div class="col-sm-8 col-xs-12">
+								<div class="form-group">
+									<select class="form-control input-sm" id="new-song">
+										<option value="1">song 1</option>
+										<option value="2">song 2</option>
+										<option value="3">song 3</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-sm-4 col-xs-12">
+								<button type="submit" class="btn btn-primary btn-sm btn-block">Add Song</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div class="row">
+	</div>
+</body>
+</html>
