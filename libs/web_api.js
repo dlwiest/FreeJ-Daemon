@@ -1,5 +1,6 @@
 const SpotifyWebAPI = require('spotify-web-api-node');
 const cache = require('memory-cache');
+const chalk = require('chalk');
 
 const config = require('../config.json');
 
@@ -22,8 +23,8 @@ module.exports = class WebApi {
 			// Refresh token every 30 minutes
 			setTimeout(this.auth.bind(this), 30 * 60 * 1000);
 		}, (problem) => {
-			console.error('Problem authenticating with the Spotify Web API:');
-			console.error(problem);
+			console.error(chalk.orange('Problem authenticating with the Spotify Web API:'));
+			console.error(chalk.orange(problem));
 			this.authorized = false;
 			// Try again in 30 seconds
 			setTimeout(this.auth.bind(this), 30 * 1000);

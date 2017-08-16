@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const https = require('https');
 const SpotifyControl = require('spotify-control');
+const chalk = require('chalk');
 
 module.exports = class Spotify extends EventEmitter {
 	static retrieveToken() {
@@ -63,7 +64,7 @@ module.exports = class Spotify extends EventEmitter {
 					setTimeout(this.connect.bind(this), 1000);
 				});
 		} catch (err) {
-			console.log(`Fatal connection error: ${err}`);
+			console.log(chalk.red(`Fatal connection error: ${err}`));
 		}
 	}
 
@@ -94,8 +95,8 @@ module.exports = class Spotify extends EventEmitter {
 	setIsConnected(status) {
 		if (this.connected !== status) {
 			this.connected = status;
-			if (this.connected) console.log('Established connection to Spotify client');
-			else console.log('Lost connection to Spotify client');
+			if (this.connected) console.log(chalk.green('Established connection to Spotify client'));
+			else console.log(chalk.orange('Lost connection to Spotify client'));
 		}
 	}
 
@@ -115,6 +116,14 @@ module.exports = class Spotify extends EventEmitter {
 
 	controlPlayStatus(play) {
 		this.spotify.pause(!play);
+	}
+
+	controlPlayTrack(track) {
+		return new Promise((resolve, reject) => {
+			this.spotify.play(track.uri)
+				.then(() => resolve())
+				.catch(() => reject());
+		});
 	}
 };
 

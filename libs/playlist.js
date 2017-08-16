@@ -1,5 +1,7 @@
 module.exports = class Playlist {
-	constructor() {
+	constructor(spotify) {
+		this.spotify = spotify;
+
 		this.list = {
 			nodes: [
 			],
@@ -7,6 +9,9 @@ module.exports = class Playlist {
 	}
 
 	addSong(song) {
-
+		this.spotify.controlPlayTrack(song)
+			.then(() => {
+				// Remove it from the list
+			});
 	}
 };

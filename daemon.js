@@ -3,9 +3,11 @@ const fs = require('fs');
 
 const Spotify = require('./libs/spotify.js');
 const WebApi = require('./libs/web_api.js');
+const Playlist = require('./libs/playlist.js');
 
 const spotify = new Spotify();
 const webApi = new WebApi();
+const playlist = new Playlist(spotify);
 
 const server = require('http').createServer((request, response) => {
 	// Serve the demo file
@@ -49,10 +51,9 @@ io.on('connection', (client) => {
 	client.on('addSong', (song) => {
 		webApi.getTrackInfo(song)
 			.then((response) => {
-				//console.log(response);
-				console.log('success');
+				playlist.addSong(response.body);
 			})
-			.catch(() => console.log('Bad track id'));
+			.catch(() => {});
 	});
 });
 
