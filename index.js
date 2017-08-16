@@ -2,13 +2,10 @@ const url = require('url');
 const fs = require('fs');
 
 const Spotify = require('./libs/spotify.js');
-const SpotifyWebApi = require('spotify-web-api-node');
+const WebApi = require('./libs/web_api.js');
 
-// testing web api
-const spotifyApi = new SpotifyWebApi();
-spotifyApi.getTrack('6CyKXBfcqpoCBh4yRvoNyK', (data) => {
-	console.log(data);
-});
+const spotify = new Spotify();
+const webApi = new WebApi();
 
 const server = require('http').createServer((request, response) => {
 	// Serve the demo file
@@ -38,8 +35,6 @@ const server = require('http').createServer((request, response) => {
 
 const io = require('socket.io')(server);
 
-const spotify = new Spotify();
-
 spotify.on('playbackStatusChanged', (change) => {
 	io.emit('playbackStatusChanged', change);
 });
@@ -52,7 +47,11 @@ io.on('connection', (client) => {
 	});
 
 	client.on('addSong', (song) => {
-		console.log(song);
+		webApi.getTrackInfo(song)
+		.then(response => {
+			console.log(response);
+		})
+			.catch(() => console.log('Bad track id'));
 	});
 });
 

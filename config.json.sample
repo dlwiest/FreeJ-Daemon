@@ -1,0 +1,11 @@
+# The Spotify Web API requires a unique Client ID and Secret for each applicaiton
+# To generate your Client ID and Secret, visit https://developer.spotify.com/my-applications/#!/
+# and create an application.
+#
+# You will also need to remove these comments and rename this file to config.json before launching the daemon.
+{
+	"webApi": {
+		"id": "YOUR CLIENT ID",
+		"secret": "YOUR CLIENT SECRET"
+	}
+}
