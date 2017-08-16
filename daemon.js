@@ -48,9 +48,9 @@ io.on('connection', (client) => {
 
 	client.on('addSong', (song) => {
 		webApi.getTrackInfo(song)
-		.then(response => {
-			console.log(response);
-		})
+			.then((response) => {
+				console.log(response);
+			})
 			.catch(() => console.log('Bad track id'));
 	});
 });

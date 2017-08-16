@@ -2,7 +2,7 @@
   "name": "freej-daemon",
   "version": "1.0.0",
   "description": "Provides real time playback information and controls for Spotify",
-  "main": "index.js",
+  "main": "launcher.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "node_modules/.bin/eslint ."
@@ -24,6 +24,7 @@
     "eslint-plugin-import": "^2.7.0"
   },
   "dependencies": {
+    "chalk": "^2.1.0",
     "socket.io": "^2.0.3",
     "spotify-control": "^0.1.0",
     "spotify-web-api-node": "^2.4.0"
