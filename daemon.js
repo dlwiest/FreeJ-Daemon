@@ -42,6 +42,7 @@ spotify.on('playbackStatusChanged', (change) => {
 });
 
 io.on('connection', (client) => {
+	const user = { id: client.request.connection.remoteAddress };
 	client.emit('playbackStatus', spotify.status);
 
 	client.on('controlPlayStatus', (play) => {
@@ -51,7 +52,7 @@ io.on('connection', (client) => {
 	client.on('addSong', (song) => {
 		webApi.getTrackInfo(song)
 			.then((response) => {
-				playlist.addSong(response.body);
+				playlist.addSong(user, response.body);
 			})
 			.catch(() => {});
 	});

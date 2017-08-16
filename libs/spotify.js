@@ -71,6 +71,13 @@ module.exports = class Spotify extends EventEmitter {
 	updatePlaybackStatus() {
 		this.spotify.status().then((result) => {
 			this.setIsConnected(true);
+
+			if (this.status.track.trackURI === result.track.track_resource.uri
+				&& !result.playing_position
+				&& this.status.position) {
+				this.emit('songEnded');
+			}
+
 			this.setStatusProperty('isOnline', result.online);
 			this.setStatusProperty('isPlaying', result.playing);
 			this.setTrackObject({
