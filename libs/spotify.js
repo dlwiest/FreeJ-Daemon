@@ -72,7 +72,7 @@ module.exports = class Spotify extends EventEmitter {
 		this.spotify.status().then((result) => {
 			this.setIsConnected(true);
 
-			if (this.status.track.trackURI === result.track.track_resource.uri
+			if (this.status.track.trackUri === result.track.track_resource.uri
 				&& !result.playing_position
 				&& this.status.position) {
 				this.emit('songEnded');
@@ -82,11 +82,11 @@ module.exports = class Spotify extends EventEmitter {
 			this.setStatusProperty('isPlaying', result.playing);
 			this.setTrackObject({
 				trackName: result.track.track_resource.name,
-				trackURI: result.track.track_resource.uri,
+				trackUri: result.track.track_resource.uri,
 				artistName: result.track.artist_resource.name,
-				artistURI: result.track.artist_resource.uri,
+				artistUri: result.track.artist_resource.uri,
 				albumName: result.track.album_resource.name,
-				albumURI: result.track.album_resource.uri,
+				albumUri: result.track.album_resource.uri,
 				trackLength: result.track.length,
 			});
 			this.setStatusProperty('position', result.playing_position);
@@ -125,9 +125,9 @@ module.exports = class Spotify extends EventEmitter {
 		this.spotify.pause(!play);
 	}
 
-	controlPlayTrack(track) {
+	controlPlayTrack(uri) {
 		return new Promise((resolve, reject) => {
-			this.spotify.play(track.uri)
+			this.spotify.play(uri)
 				.then(() => resolve())
 				.catch(() => reject());
 		});

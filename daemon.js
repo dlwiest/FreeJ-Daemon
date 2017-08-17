@@ -41,9 +41,14 @@ spotify.on('playbackStatusChanged', (change) => {
 	io.emit('playbackStatusChanged', change);
 });
 
+playlist.on('updatePlaylist', (newList) => {
+	io.emit('updatePlaylist', newList);
+});
+
 io.on('connection', (client) => {
 	const user = { id: client.request.connection.remoteAddress };
 	client.emit('playbackStatus', spotify.status);
+	client.emit('updatePlaylist', playlist.playlist);
 
 	client.on('controlPlayStatus', (play) => {
 		spotify.controlPlayStatus(play);

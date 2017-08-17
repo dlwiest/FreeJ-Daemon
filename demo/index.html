@@ -39,19 +39,28 @@
 					<div class="panel-heading">Playlist</div>
 					<div class="panel-body">
 						<form onSubmit="addSong()">
-							<div class="col-sm-8 col-xs-12">
-								<div class="form-group">
-									<select class="form-control input-sm" id="new-song">
-										<option value="5nHRIKsXDwUpse9gzrAxLR">Oxford Comma</option>
-										<option value="3ExmkTE3eldMCyNq8WAUp6">Sweet Talk, Sweet Talk</option>
-										<option value="4wd09wCccmxUB7XVJp0RNn">Jesus, etc.</option>
-									</select>
+							<div class="row">
+								<div class="col-sm-8 col-xs-12">
+									<div class="form-group">
+										<select class="form-control input-sm" id="new-song">
+											<option value="5nHRIKsXDwUpse9gzrAxLR">Oxford Comma</option>
+											<option value="3ExmkTE3eldMCyNq8WAUp6">Sweet Talk, Sweet Talk</option>
+											<option value="4wd09wCccmxUB7XVJp0RNn">Jesus, etc.</option>
+											<option value="4yY8JqTOQyi7K4O1QcQtBG">Portions for Foxes</option>
+											<option value="1WTMcJpdYwVeXOaqG3X68E">Continuous Thunder</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-sm-4 col-xs-12">
+									<button type="submit" class="btn btn-primary btn-sm btn-block">Add Song</button>
 								</div>
 							</div>
-							<div class="col-sm-4 col-xs-12">
-								<button type="submit" class="btn btn-primary btn-sm btn-block">Add Song</button>
-							</div>
 						</form>
+						<div class="row">
+							<div class="col-sm-12">
+								<ul class="list-group" id="playlist-group"></ul>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

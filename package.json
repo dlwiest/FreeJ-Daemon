@@ -28,6 +28,7 @@
     "memory-cache": "^0.2.0",
     "socket.io": "^2.0.3",
     "spotify-control": "^0.1.0",
-    "spotify-web-api-node": "^2.4.0"
+    "spotify-web-api-node": "^2.4.0",
+    "uid-generator": "^0.1.1"
   }
 }

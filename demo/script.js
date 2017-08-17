@@ -78,5 +78,17 @@ const processStatusUpdate = (update) => {
 	} else processElement(key, value);
 };
 
-socket.on('playbackStatus', (status) => processStatus(status));
-socket.on('playbackStatusChanged', (update) => processStatusUpdate(update));
+const updatePlaylist = (newList) => {
+	const element = document.getElementById('playlist-group');
+	element.innerHTML = '';
+	newList.forEach((song) => {
+		console.log(song);
+		element.innerHTML += `
+			<li class="list-group-item ${song.status === 'playing' ? 'list-group-item-success' : null}">${song.trackInfo.trackName} - <small>${song.trackInfo.artistName}</li>
+		`;
+	});
+};
+
+socket.on('playbackStatus', status => processStatus(status));
+socket.on('playbackStatusChanged', update => processStatusUpdate(update));
+socket.on('updatePlaylist', newList => updatePlaylist(newList));
