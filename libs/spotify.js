@@ -103,7 +103,7 @@ module.exports = class Spotify extends EventEmitter {
 		if (this.connected !== status) {
 			this.connected = status;
 			if (this.connected) console.log(chalk.green('Established connection to Spotify client'));
-			else console.log(chalk.orange('Lost connection to Spotify client'));
+			else console.log(chalk.yellow('Lost connection to Spotify client'));
 		}
 	}
 

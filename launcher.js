@@ -16,4 +16,4 @@ if (!fs.existsSync('./config.json')) {
 	process.exit();
 }
 
-launch('./daemon.js');
+launch('./server.js');

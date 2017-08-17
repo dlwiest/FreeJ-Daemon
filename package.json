@@ -24,7 +24,9 @@
     "eslint-plugin-import": "^2.7.0"
   },
   "dependencies": {
+    "body-parser": "^1.17.2",
     "chalk": "^2.1.0",
+    "express": "^4.15.4",
     "memory-cache": "^0.2.0",
     "socket.io": "^2.0.3",
     "spotify-control": "^0.1.0",
