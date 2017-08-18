@@ -41,7 +41,7 @@ module.exports = class Playlist {
 		if (pod) {
 			// Add the song to the existing pod
 			pod.songs.push({
-				id: this.uidgen.generateSync(),
+				id: this.uidGen.generateSync(),
 				selectedAt: new Date(),
 				selectedBy: user,
 				trackInfo,
