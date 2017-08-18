@@ -1,17 +1,23 @@
-const EventEmitter = require('events');
+// playlist.js
+
 const UIDGenerator = require('uid-generator');
 
-module.exports = class Playlist extends EventEmitter {
-	constructor(spotify) {
-		super();
-		this.uidgen = new UIDGenerator();
-		this.spotify = spotify;
-		this.spotify.on('songEnded', () => {
-			this.playNext();
-		});
+module.exports = class Playlist {
+	constructor() {
+		this.uidGen = new UIDGenerator();
 
 		this.pods = [];
-		this.playlist = [];
+		this.list = [];
+	}
+
+	rebuildPlaylist() {
+		const newList = [];
+		this.pods.forEach((pod) => {
+			pod.songs.forEach((song) => {
+				newList.push(song);
+			});
+		});
+		this.list = newList;
 	}
 
 	addSong(user, song) {
@@ -44,10 +50,10 @@ module.exports = class Playlist extends EventEmitter {
 		} else {
 			// Create a new pod with the song
 			const newPod = {
-				id: this.uidgen.generateSync(),
+				id: this.uidGen.generateSync(),
 				createdAt: new Date(),
 				songs: [{
-					id: this.uidgen.generateSync(),
+					id: this.uidGen.generateSync(),
 					selectedAt: new Date(),
 					selectedBy: user,
 					trackInfo,
@@ -57,33 +63,19 @@ module.exports = class Playlist extends EventEmitter {
 			this.pods.push(newPod);
 		}
 		this.rebuildPlaylist();
-
-		// Start the next song on the playlist if nothing is playing currently
-		if (!this.spotify.status.isPlaying) this.playNext();
 	}
 
-	rebuildPlaylist() {
-		const newList = [];
-		this.pods.forEach((pod) => {
-			pod.songs.forEach((song) => {
-				newList.push(song);
-			});
-		});
-		this.playlist = newList;
-		this.emit('updatePlaylist', this.playlist);
-	}
-
-	playNext() {
-		// Mark whatever is currently playing as complete
-		const nowPlaying = this.playlist.find(song => song.status === 'playing');
+	next() {
+		// Mark the current song as finished
+		const nowPlaying = this.list.find(song => song.status === 'playing');
 		if (nowPlaying) nowPlaying.status = 'finished';
 
-		// Play the next pending song on the list
-		const next = this.playlist.find(song => song.status === 'pending');
-		this.spotify.controlPlayTrack(next.trackInfo.trackUri)
-			.then(() => {
-				next.status = 'playing';
-				this.emit('updatePlaylist', this.playlist);
-			});
+		// Mark the next pending song as playing and return the URI
+		const next = this.list.find(song => song.status === 'pending');
+		if (next) {
+			next.status = 'playing';
+			return next.trackInfo.trackUri;
+		}
+		return null;
 	}
 };

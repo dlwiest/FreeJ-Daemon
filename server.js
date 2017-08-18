@@ -6,7 +6,7 @@ const WebApi = require('./libs/web_api.js');
 const Playlist = require('./libs/playlist.js');
 
 const spotify = new Spotify();
-const playlist = new Playlist(spotify);
+const playlist = new Playlist();
 const webApi = new WebApi();
 
 // Express configuration
@@ -28,20 +28,22 @@ app.get('/test', (req, res) => {
 // WebSocket configuration
 const io = require('socket.io')(server);
 
-// Update sockets on playback and list changes
+// Spotify playback events
 spotify.on('playbackStatusChanged', (change) => {
 	io.emit('playbackStatusChanged', change);
 });
 
-playlist.on('updatePlaylist', (newList) => {
-	io.emit('updatePlaylist', newList);
+spotify.on('songEnded', () => {
+	const nextUri = playlist.next();
+	if (nextUri) spotify.controlPlayTrack(nextUri);
+	io.emit('updatePlaylist', playlist.list);
 });
 
 // Handle individual WebSocket connections
 io.on('connection', (client) => {
 	const user = { id: client.request.connection.remoteAddress };
 	client.emit('playbackStatus', spotify.status);
-	client.emit('updatePlaylist', playlist.playlist);
+	client.emit('updatePlaylist', playlist.list);
 
 	client.on('controlPlayStatus', (play) => {
 		spotify.controlPlayStatus(play);
@@ -51,6 +53,11 @@ io.on('connection', (client) => {
 		webApi.getTrackInfo(song)
 			.then((response) => {
 				playlist.addSong(user, response.body);
+				// If this is the first unplayed song on the list, start playing
+				if (playlist.list.filter(s => s.status !== 'finished').length === 1) {
+					spotify.controlPlayTrack(playlist.next());
+				}
+				io.emit('updatePlaylist', playlist.list);
 			})
 			.catch(() => {});
 	});
