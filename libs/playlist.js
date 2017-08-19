@@ -30,9 +30,9 @@ module.exports = class Playlist {
 			albumUri: song.album.uri,
 		};
 
-		// Find the first pod that doesn't contain any picks from this user
+		// Find the first pod that doesn't contain any picks from this user and hasn't expired
 		const pod = this.pods.find((p) => {
-			if (!p.songs.find(s => s.selectedBy.id === user.id)) {
+			if (!p.expired && !p.songs.find(s => s.selectedBy.id === user.id)) {
 				return p;
 			}
 			return null;
@@ -52,6 +52,7 @@ module.exports = class Playlist {
 			const newPod = {
 				id: this.uidGen.generateSync(),
 				createdAt: new Date(),
+				expired: false,
 				songs: [{
 					id: this.uidGen.generateSync(),
 					selectedAt: new Date(),
@@ -68,7 +69,13 @@ module.exports = class Playlist {
 	next() {
 		// Mark the current song as finished
 		const nowPlaying = this.list.find(song => song.status === 'playing');
-		if (nowPlaying) nowPlaying.status = 'finished';
+		if (nowPlaying) {
+			nowPlaying.status = 'finished';
+
+			// Expire the pod if necessary
+			const pod = this.pods.find(p => p.songs.find(s => s.id === nowPlaying.id));
+			if (!pod.songs.filter(s => s.status !== 'finished').length) pod.expired = true;
+		}
 
 		// Mark the next pending song as playing and return the URI
 		const next = this.list.find(song => song.status === 'pending');

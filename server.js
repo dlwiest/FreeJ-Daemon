@@ -20,6 +20,7 @@ app.use(bodyParser.json());
 app.use('/demo', express.static('demo'));
 
 // Express Routes
+// TODO: Create some routes to return web API info for album art, search results, etc.
 app.get('/test', (req, res) => {
 	res.setHeader('Content-Type', 'application/json');
 	res.send(JSON.stringify({ message: 'test' }, null, 3));
