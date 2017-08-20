@@ -1,6 +1,7 @@
 // playlist.js
 
 const UIDGenerator = require('uid-generator');
+const fs = require('fs');
 
 module.exports = class Playlist {
 	constructor() {
@@ -8,6 +9,15 @@ module.exports = class Playlist {
 
 		this.pods = [];
 		this.list = [];
+
+		// Attempt to restore pending tracks in the playlist
+		if (fs.existsSync('./pods.json')) {
+			const result = fs.readFileSync('./pods.json', 'utf-8');
+			if (result) {
+				this.pods = JSON.parse(result);
+				this.rebuildPlaylist();
+			}
+		}
 	}
 
 	rebuildPlaylist() {
@@ -18,6 +28,13 @@ module.exports = class Playlist {
 			});
 		});
 		this.list = newList;
+
+		this.backupPods();
+	}
+
+	backupPods() {
+		// Back up pods that haven't expired for persistence (in case of server restarts, etc.)
+		fs.writeFile('./pods.json', JSON.stringify(this.pods.filter(p => !p.expired)), 'utf8', () => {});
 	}
 
 	addSong(user, song) {
@@ -76,6 +93,8 @@ module.exports = class Playlist {
 			const pod = this.pods.find(p => p.songs.find(s => s.id === nowPlaying.id));
 			if (!pod.songs.filter(s => s.status !== 'finished').length) pod.expired = true;
 		}
+
+		this.backupPods();
 
 		// Mark the next pending song as playing and return the URI
 		const next = this.list.find(song => song.status === 'pending');
