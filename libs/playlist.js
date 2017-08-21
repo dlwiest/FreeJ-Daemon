@@ -1,10 +1,12 @@
 // playlist.js
 
+const EventEmitter = require('events');
 const UIDGenerator = require('uid-generator');
 const fs = require('fs');
 
-module.exports = class Playlist {
+module.exports = class Playlist extends EventEmitter {
 	constructor() {
+		super();
 		this.uidGen = new UIDGenerator();
 
 		this.pods = [];
@@ -30,6 +32,7 @@ module.exports = class Playlist {
 		this.list = newList;
 
 		this.backupPods();
+		this.emit('playlistUpdate');
 	}
 
 	backupPods() {
@@ -55,32 +58,42 @@ module.exports = class Playlist {
 			return null;
 		});
 
-		if (pod) {
-			// Add the song to the existing pod
-			pod.songs.push({
-				id: this.uidGen.generateSync(),
-				selectedAt: new Date(),
-				selectedBy: user,
-				trackInfo,
-				status: 'pending',
-			});
-		} else {
-			// Create a new pod with the song
-			const newPod = {
-				id: this.uidGen.generateSync(),
-				createdAt: new Date(),
-				expired: false,
-				songs: [{
-					id: this.uidGen.generateSync(),
-					selectedAt: new Date(),
-					selectedBy: user,
-					trackInfo,
-					status: 'pending',
-				}],
-			};
-			this.pods.push(newPod);
-		}
-		this.rebuildPlaylist();
+		// Synchronously generate a song ID
+		this.uidGen.generate((songIdErr, songId) => {
+			if (!songIdErr) {
+				if (pod) {
+					// Add the song to the existing pod
+					pod.songs.push({
+						id: songId,
+						selectedAt: new Date(),
+						selectedBy: user,
+						trackInfo,
+						status: 'pending',
+					});
+					this.rebuildPlaylist();
+				} else {
+					// Synchronously generate a pod ID and add the song to a new pod
+					this.uidGen.generate((podIdErr, podId) => {
+						if (!podIdErr) {
+							const newPod = {
+								id: podId,
+								createdAt: new Date(),
+								expired: false,
+								songs: [{
+									id: songId,
+									selectedAt: new Date(),
+									selectedBy: user,
+									trackInfo,
+									status: 'pending',
+								}],
+							};
+							this.pods.push(newPod);
+							this.rebuildPlaylist();
+						}
+					});
+				}
+			}
+		});
 	}
 
 	next() {
@@ -100,8 +113,10 @@ module.exports = class Playlist {
 		const next = this.list.find(song => song.status === 'pending');
 		if (next) {
 			next.status = 'playing';
+			this.emit('playlistUpdate');
 			return next.trackInfo.trackUri;
 		}
+		this.emit('playlistUpdate');
 		return null;
 	}
 };

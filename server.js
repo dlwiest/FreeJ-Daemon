@@ -29,6 +29,11 @@ app.get('/test', (req, res) => {
 // WebSocket configuration
 const io = require('socket.io')(server);
 
+// Playlist events
+playlist.on('playlistUpdate', () => {
+	io.emit('updatePlaylist', playlist.list);
+});
+
 // Spotify playback events
 spotify.on('playbackStatusChanged', (change) => {
 	io.emit('playbackStatusChanged', change);
@@ -37,7 +42,6 @@ spotify.on('playbackStatusChanged', (change) => {
 spotify.on('songEnded', () => {
 	const nextUri = playlist.next();
 	if (nextUri) spotify.controlPlayTrack(nextUri);
-	io.emit('updatePlaylist', playlist.list);
 });
 
 // Handle individual WebSocket connections
@@ -58,7 +62,6 @@ io.on('connection', (client) => {
 				if (playlist.list.filter(s => s.status !== 'finished').length === 1) {
 					spotify.controlPlayTrack(playlist.next());
 				}
-				io.emit('updatePlaylist', playlist.list);
 			})
 			.catch(() => {});
 	});

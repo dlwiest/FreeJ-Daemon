@@ -1,3 +1,5 @@
+// spotify.js
+
 const EventEmitter = require('events');
 const https = require('https');
 const SpotifyControl = require('spotify-control');
