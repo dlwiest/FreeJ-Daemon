@@ -23,8 +23,6 @@ module.exports = class Playlist extends EventEmitter {
 	}
 
 	rebuildPlaylist() {
-		const newList = [];
-
 		if (this.pods.length) {
 			this.list = this.pods.reduce((prev, cur) => prev.concat(cur.songs), []);
 			this.backupPods();
@@ -55,41 +53,45 @@ module.exports = class Playlist extends EventEmitter {
 			return null;
 		});
 
-		// Synchronously generate a song ID
-		this.uidGen.generate((songIdErr, songId) => {
-			if (!songIdErr) {
-				if (pod) {
-					// Add the song to the existing pod
-					pod.songs.push({
-						id: songId,
-						selectedAt: new Date(),
-						selectedBy: user,
-						trackInfo,
-						status: 'pending',
-					});
-					this.rebuildPlaylist();
-				} else {
-					// Synchronously generate a pod ID and add the song to a new pod
-					this.uidGen.generate((podIdErr, podId) => {
-						if (!podIdErr) {
-							const newPod = {
-								id: podId,
-								createdAt: new Date(),
-								expired: false,
-								songs: [{
-									id: songId,
-									selectedAt: new Date(),
-									selectedBy: user,
-									trackInfo,
-									status: 'pending',
-								}],
-							};
-							this.pods.push(newPod);
-							this.rebuildPlaylist();
-						}
-					});
+		return new Promise((resolve) => {
+			// Generate a song ID
+			this.uidGen.generate((songIdErr, songId) => {
+				if (!songIdErr) {
+					if (pod) {
+						// Add the song to the existing pod
+						pod.songs.push({
+							id: songId,
+							selectedAt: new Date(),
+							selectedBy: user,
+							trackInfo,
+							status: 'pending',
+						});
+						this.rebuildPlaylist();
+						resolve();
+					} else {
+						// Generate a pod ID and add the song to a new pod
+						this.uidGen.generate((podIdErr, podId) => {
+							if (!podIdErr) {
+								const newPod = {
+									id: podId,
+									createdAt: new Date(),
+									expired: false,
+									songs: [{
+										id: songId,
+										selectedAt: new Date(),
+										selectedBy: user,
+										trackInfo,
+										status: 'pending',
+									}],
+								};
+								this.pods.push(newPod);
+								this.rebuildPlaylist();
+								resolve();
+							}
+						});
+					}
 				}
-			}
+			});
 		});
 	}
 
@@ -104,16 +106,16 @@ module.exports = class Playlist extends EventEmitter {
 			if (!pod.songs.filter(s => s.status !== 'finished').length) pod.expired = true;
 		}
 
-		this.backupPods();
-
 		// Mark the next pending song as playing and return the URI
 		const next = this.list.find(song => song.status === 'pending');
 		if (next) {
 			next.status = 'playing';
 			this.emit('playlistUpdate');
+			this.backupPods();
 			return next.trackInfo.trackUri;
 		}
 		this.emit('playlistUpdate');
+		this.backupPods();
 		return null;
 	}
 };

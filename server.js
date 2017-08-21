@@ -55,13 +55,17 @@ io.on('connection', (client) => {
 	});
 
 	client.on('addSong', (song) => {
+		// Verify that the song exists before adding it
 		webApi.getTrackInfo(song)
 			.then((response) => {
-				playlist.addSong(user, response.body);
-				// If this is the first unplayed song on the list, start playing
-				if (playlist.list.filter(s => s.status !== 'finished').length === 1) {
-					spotify.controlPlayTrack(playlist.next());
-				}
+				// Add the song to the playlist
+				playlist.addSong(user, response.body)
+					.then(() => {
+						// If this is the first unplayed song on the list, start playing
+						if (playlist.list.filter(s => s.status !== 'finished').length === 1) {
+							spotify.controlPlayTrack(playlist.next());
+						}
+					});
 			})
 			.catch(() => {});
 	});
