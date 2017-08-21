@@ -24,15 +24,12 @@ module.exports = class Playlist extends EventEmitter {
 
 	rebuildPlaylist() {
 		const newList = [];
-		this.pods.forEach((pod) => {
-			pod.songs.forEach((song) => {
-				newList.push(song);
-			});
-		});
-		this.list = newList;
 
-		this.backupPods();
-		this.emit('playlistUpdate');
+		if (this.pods.length) {
+			this.list = this.pods.reduce((prev, cur) => prev.concat(cur.songs), []);
+			this.backupPods();
+			this.emit('playlistUpdate');
+		}
 	}
 
 	backupPods() {
